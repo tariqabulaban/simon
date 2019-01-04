@@ -1,3 +1,5 @@
+
+
 var KEYS = ['c', 'd', 'e', 'f'];
 var NOTE_DURATION = 1000;
 
@@ -60,17 +62,42 @@ function NoteBox(key, onClick) {
 	boxEl.addEventListener('mousedown', this.clickHandler);
 }
 
-// Example usage of NoteBox.
-//
-// This will create a map from key strings (i.e. 'c') to NoteBox objects so that
-// clicking the corresponding boxes on the page will play the NoteBox's audio.
-// It will also demonstrate programmatically playing notes by calling play directly.
-var notes = {};
 
-KEYS.forEach(function (key) {
-	notes[key] = new NoteBox(key);
-});
 
-KEYS.concat(KEYS.slice().reverse()).forEach(function(key, i) {
-	setTimeout(notes[key].play.bind(null, key), i * NOTE_DURATION);
-});
+function easyTaskEcho(){
+		var currentTimeout = setTimeout(null,0);
+		var playbackNotes = [];
+		const timeOut = 2500; // 2500 in milliseconds, 2.5 seconds
+		var notes = {};
+
+	KEYS.forEach(function (key) {
+		notes[key] = new NoteBox(key);
+		setEventListener(key);
+	});
+
+	//Sets an listener for each box element that we have clicked on
+	function setEventListener(key) {
+		var box = document.getElementById(key);
+		box.addEventListener('mousedown', function(){addToPlaybackBuffer(box.id)});
+	}
+
+	// clear the currentTimeout, append to playbackNotes buffer, and reset timer
+  function addToPlaybackBuffer(key){
+    clearTimeout(currentTimeout);
+		// add to the playBackNotes buffer
+    playbackNotes.push(notes[key]);
+		// reset the timer
+    currentTimeout = setTimeout(function(){playBuffer()}, timeOut);
+  };
+
+	// is called when timeOut is concluded
+  function playBuffer(){
+    playbackNotes.forEach(function(note, i){
+      setTimeout(note.play.bind(null, note), i * NOTE_DURATION);
+    });
+		// reset the playbackNotes buffer by clearing.
+		playbackNotes = [];
+  };
+}
+
+easyTaskEcho();
